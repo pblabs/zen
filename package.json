@@ -1,7 +1,7 @@
 {
   "name": "zen",
   "version": "0.0.1",
-  "description": "Zen is a simple, minimal, fast, general purpose module engine",
+  "description": "Zen is a simple, basic, fast, general purpose module engine",
   "keywords": ["engine", "stack", "module", "wsgi", "rack", "next"],
   "repository": "git://github.com/pblabs/zen.git",
   "author": "pibi <pibi@pianobit.com> (http://pianobit.com)",

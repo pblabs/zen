@@ -29,6 +29,7 @@ module.exports= function (/*layers*/) {
 	Array.prototype.slice.call(arguments).reverse().forEach( function (layer) {
 		var child = handle;
 		handle = function (/*arguments*/) {
+			var self=this;
 			var handleArgs=Array.prototype.slice.call(arguments);
 			var layerArgs=Array.prototype.slice.call(handleArgs);
 			layerArgs.push( function next (err,res) {
@@ -36,12 +37,12 @@ module.exports= function (/*layers*/) {
 					if (err) {
 						var errArgs=Array.prototype.slice.call(handleArgs);
 						errArgs.push(res);
-						return error.apply(this,errArgs);
+						return error.apply(self,errArgs);
 					}
 					if (res) {
 						var resArgs=Array.prototype.slice.call(handleArgs);
 						resArgs.push(res);
-						return result.apply(this,resArgs);
+						return result.apply(self,resArgs);
 					}
 					return child.apply(this,handleArgs);
 				} catch (err) {

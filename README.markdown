@@ -48,7 +48,7 @@ When using external modules a good convention is to make the module be a callabl
 
 ## What Zen Does
 
-As creationix/stack, Zen does a few things under the hood.
+Zen does a few things under the hood.
 
  - Creates standalone module stacks, escaping node's module caching. With this stacks could be chained together.
  - Calls each module passing given arguments. This means modules can "chain" partial result by reference.
@@ -57,7 +57,7 @@ As creationix/stack, Zen does a few things under the hood.
  - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module don't have to worry about errors from previous modules.
  - Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic  
 
-errorHandler and resultHandler could be overridde by custom function. As handler above these needs to be of the form:
+errorHandler and resultHandler could be overridden by custom functions. As sample above these needs to be of the form:
 
 function errorHandler(your, personal, args, err) {
 }

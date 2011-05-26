@@ -2,7 +2,7 @@
 
 Zen is a simple, minimal, fast, general purpose javascript module stack engine.
 
-Basically it's extend the idea of http://github.com/creationix/stack to general purpose application.
+It extends the idea of http://github.com/creationix/stack to general purpose application.
 
 ## Install
 

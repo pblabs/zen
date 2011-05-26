@@ -50,7 +50,9 @@ When using external modules a good convention is to make the module be a callabl
 
 As creationix/stack, Zen does a few things under the hood.
 
- - Calls each layer passing given arguments. This means modules can "chain" partial result by reference.
+ - Creates standalone module stacks, escaping node's module caching. With this stacks could be chained together.
+ - Calls each module passing given arguments. This means modules can "chain" partial result by reference.
+ - Returns any given value to parent handler. This means as long as application uses `return next();` value returned could be popped to the caller (useful for synchronous application stack).  
  - Wraps each layer in a `try..catch` to catch any exceptions that happen in the main execution stack module's handler function or in the callback.
  - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module don't have to worry about errors from previous modules.
  - Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic  

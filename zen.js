@@ -20,10 +20,10 @@ resultHandler = function result(/*args,*/ res) {
 
 module.exports= function (/*layers*/) {
 	var error = function(/*args*/) {
-		handle.errorHandler.apply(this,arguments);
+		return handle.errorHandler.apply(this,arguments);
 	},
 	result= function(/*args*/) {
-		handle.resultHandler.apply(this,arguments);
+		return handle.resultHandler.apply(this,arguments);
 	},
 	handle = error;
 	Array.prototype.slice.call(arguments).reverse().forEach( function (layer) {
@@ -43,7 +43,7 @@ module.exports= function (/*layers*/) {
 						resArgs.push(res);
 						return result.apply(this,resArgs);
 					}
-					child.apply(this,handleArgs);
+					return child.apply(this,handleArgs);
 				} catch (err) {
 					var errArgs=Array.prototype.slice.call(handleArgs);
 					errArgs.push(res);
@@ -51,7 +51,7 @@ module.exports= function (/*layers*/) {
 				}
 			});
 			try {
-				layer.apply(this,layerArgs);
+				return layer.apply(this,layerArgs);
 			} catch (err) {
 				var errArgs=Array.prototype.slice.call(handleArgs);
 				errArgs.push(err);
@@ -59,7 +59,7 @@ module.exports= function (/*layers*/) {
 			}
 		};
 	});
-	handle.errorHandler=errorHandler;
+	handle.errorHandler = errorHandler;
 	handle.resultHandler = resultHandler;
 	return handle;
 };

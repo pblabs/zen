@@ -67,5 +67,5 @@ function resultHandler(your, personal, args, res) {
 
 ## What Zen Does NOT Do
 
-Due its general purpose, Zen does not provide any middleware modules of any kind.
+Due its general purpose, Zen does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
 

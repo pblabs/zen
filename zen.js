@@ -38,7 +38,7 @@ module.exports= function (/*layers*/) {
 				try {
 					if (err) {
 						var errArgs=Array.prototype.slice.call(handleArgs);
-						errArgs.push(res);
+						errArgs.push(err);
 						return error.apply(self,errArgs);
 					}
 					if (res) {
@@ -49,7 +49,7 @@ module.exports= function (/*layers*/) {
 					return child.apply(this,handleArgs);
 				} catch (err) {
 					var errArgs=Array.prototype.slice.call(handleArgs);
-					errArgs.push(res);
+					errArgs.push(err);
 					return error.apply(this,errArgs);
 				}
 			});

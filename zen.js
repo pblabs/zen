@@ -1,7 +1,8 @@
 /**
  * Default error handler
  */
-errorHandler = function error(/*args,*/ err) {
+errorHandler = function error(/*args,*/ /*err*/) {
+	var err=(arguments.length >0)?arguments[arguments.length-1]:null;
 	if (typeof err == "undefined" || !err) 
 		return console.error("Error:","This is the end, with no result given");
 	var error=err;
@@ -13,7 +14,8 @@ errorHandler = function error(/*args,*/ err) {
 /**
  * Default result handler
  */
-resultHandler = function result(/*args,*/ res) {
+resultHandler = function result(/*args,*/ /*res*/) {
+	var res=(arguments.length >0)?arguments[arguments.length-1]:null;
 	console.log(res);
 	return;
 };

@@ -3,7 +3,7 @@
  */
 errorHandler = function error(/*args,*/ /*err*/) {
 	var err=(arguments.length >0)?arguments[arguments.length-1]:null;
-	if (typeof err == "undefined" || !err) 
+	if (typeof err == "undefined" || !err)
 		return console.error("Error:","This is the end, with no result given");
 	var error=err;
 	if (err.stack)
@@ -22,46 +22,43 @@ resultHandler = function result(/*args,*/ /*res*/) {
 
 module.exports= function (/*layers*/) {
 	var error = function(/*args*/) {
-		return handle.errorHandler.apply(this,arguments);
+		return handle.errorHandler.apply(self,arguments);
 	},
 	result= function(/*args*/) {
-		return handle.resultHandler.apply(this,arguments);
+		return handle.resultHandler.apply(self,arguments);
 	},
-	handle = error;
-	Array.prototype.slice.call(arguments).reverse().forEach( function (layer) {
-		var child = handle;
-		handle = function (/*arguments*/) {
-			var self=this;
-			var handleArgs=Array.prototype.slice.call(arguments);
-			var layerArgs=Array.prototype.slice.call(handleArgs);
-			layerArgs.push( function next (err,res) {
-				try {
-					if (err) {
-						var errArgs=Array.prototype.slice.call(handleArgs);
-						errArgs.push(err);
-						return error.apply(self,errArgs);
-					}
-					if (res) {
-						var resArgs=Array.prototype.slice.call(handleArgs);
-						resArgs.push(res);
-						return result.apply(self,resArgs);
-					}
-					return child.apply(this,handleArgs);
-				} catch (err) {
-					var errArgs=Array.prototype.slice.call(handleArgs);
-					errArgs.push(err);
-					return error.apply(this,errArgs);
-				}
-			});
-			try {
-				return layer.apply(this,layerArgs);
-			} catch (err) {
-				var errArgs=Array.prototype.slice.call(handleArgs);
-				errArgs.push(err);
-				return error.apply(this,errArgs);
+	layers=Array.prototype.concat([error],Array.prototype.slice.call(arguments).reverse());
+	var handleArgs,self;
+	var L=layers.length-1;
+	var first=layers[L];
+	var i=L;
+	var next= function(err,res) {
+		try {
+			if (err) {
+				handleArgs[handleArgs.length-1]=err; //overriding last arg
+				return error.apply(self,handleArgs);
 			}
-		};
-	});
+			if (res) {
+				handleArgs[handleArgs.length-1]=res; //overriding last arg				
+				return result.apply(self,handleArgs);
+			}
+			return layers[--i].apply(self,handleArgs);
+		} catch (err) {
+			handleArgs[handleArgs.length-1]=err; //overriding last arg
+			return error.apply(self,handleArgs);
+		}
+	}
+	var handle= function (/*handleArgs*/) {
+		self=this;
+		try {
+			handleArgs=Array.prototype.slice.call(arguments);
+			handleArgs.push(next);
+			return first.apply(self,handleArgs);
+		} catch (err) {
+			handleArgs[handleArgs.length-1]=err; //overriding last arg
+			return error.apply(self,handleArgs);
+		}
+	}
 	handle.errorHandler = errorHandler;
 	handle.resultHandler = resultHandler;
 	return handle;

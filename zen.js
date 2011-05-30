@@ -16,47 +16,52 @@ errorHandler = function error(/*args,*/ /*err*/) {
  */
 resultHandler = function result(/*args,*/ /*res*/) {
 	var res=(arguments.length >0)?arguments[arguments.length-1]:null;
-	console.log(res);
 	return;
 };
-
 module.exports= function (/*layers*/) {
 	var error = function(/*args*/) {
-		return handle.errorHandler.apply(self,arguments);
-	},
-	result= function(/*args*/) {
-		return handle.resultHandler.apply(self,arguments);
+		return handle.errorHandler.apply(this,arguments);
 	},
 	layers=Array.prototype.concat([error],Array.prototype.slice.call(arguments).reverse());
-	var handleArgs,self;
+	//optimize first access
 	var L=layers.length-1;
 	var first=layers[L];
-	var i=L;
-	var next= function(err,res) {
-		try {
-			if (err) {
-				handleArgs[handleArgs.length-1]=err; //overriding last arg
-				return error.apply(self,handleArgs);
-			}
-			if (res) {
-				handleArgs[handleArgs.length-1]=res; //overriding last arg				
-				return result.apply(self,handleArgs);
-			}
-			return layers[--i].apply(self,handleArgs);
-		} catch (err) {
-			handleArgs[handleArgs.length-1]=err; //overriding last arg
-			return error.apply(self,handleArgs);
+
+	var nextHandler= function(/* args, err, res */) {
+		var args=Array.prototype.slice.call(arguments);
+		var res=args.pop();
+		var err=args.pop();
+		try{
+		if (err) {
+			args.push(err); 
+			return handle.errorHandler.apply(this,args);
+		}
+		else if (res) {
+			args.push(res);
+			return handle.resultHandler.apply(this,args);
+		}
+		} catch (ex) {
+			args.push(ex); 
+			return handle.errorHandler.apply(this,args);
 		}
 	}
 	var handle= function (/*handleArgs*/) {
-		self=this;
+		var handleArgs=Array.prototype.slice.call(arguments);
+		var self=this;
+		var i=L;
+		var next= function(err,res) {
+			if(err||res) {
+				handleArgs[handleArgs.length-1]=err; //overriding last arg
+				return nextHandler.apply(self,Array.prototype.concat(handleArgs,[res]));
+			} else
+				return layers[--i].apply(self,handleArgs);
+		}
+		handleArgs.push(next);
 		try {
-			handleArgs=Array.prototype.slice.call(arguments);
-			handleArgs.push(next);
 			return first.apply(self,handleArgs);
 		} catch (err) {
 			handleArgs[handleArgs.length-1]=err; //overriding last arg
-			return error.apply(self,handleArgs);
+			return handle.errorHandler.apply(self,handleArgs);
 		}
 	}
 	handle.errorHandler = errorHandler;

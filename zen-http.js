@@ -21,49 +21,52 @@ errorHandler = function error(req, resp, err) {
 /**
  * Default result handler
  */
-resultHandler = function result(req, resp, result) {	
+resultHandler = function result(req, resp, result) {
 	resp.writeHead(200, {
 		"Content-Type": "octet/stream"
 	});
 	resp.end(result);
 };
-
+/**
+ * Zen uses a 'setup' pattern, returning a callable engine function
+ */
 module.exports= function (/*layers*/) {
 	var error = function(req, resp, err) {
-		return handle.errorHandler(req, resp, err);
+		return engine.errorHandler(req, resp, err);
 	};
 	var layers=Array.prototype.concat([error],Array.prototype.slice.call(arguments).reverse());
 
 	var L=layers.length-1;
 	var first=layers[L];//first access optimization
 
-	var nextHandler= function(req,resp,err,res) {	
+	var nextHandler= function(req,resp,err,res) {
 		try {
-			if (err){
-				return handle.errorHandler(req, resp, err); //err				
+			if (err) {
+				return engine.errorHandler(req, resp, err); //err
 			}
-			if (resp)				
-				return handle.resultHandler(req, resp, res);
+			if (resp)
+				return engine.resultHandler(req, resp, res);
 		} catch (ex) {
-			return handle.errorHandler(req, resp, ex);
+			return engine.errorHandler(req, resp, ex);
 		}
 		return;
 	}
-	var handle= function (req, resp) {
+	// The real Zen Engine
+	var engine= function (req, resp) {
 		var i=L;
-		var next= function(err,res) {			
-			if (err||res) //response optimization
-				return nextHandler(req,resp,err,res);
-			else	
-				return layers[--i](req,resp,next);
-		}
 		try {
+			var next= function(err,res) {
+				if (err||res) //response optimization
+					return nextHandler(req,resp,err,res);
+				else
+					return layers[--i](req,resp,next);
+			}
 			return first(req,resp,next);
 		} catch (err) {
-			return handle.errorHandler(req, resp, err);
+			return engine.errorHandler(req, resp, err);
 		}
 	}
-	handle.errorHandler = errorHandler;
-	handle.resultHandler = resultHandler;
-	return handle;
+	engine.errorHandler = errorHandler;
+	engine.resultHandler = resultHandler;
+	return engine;
 };

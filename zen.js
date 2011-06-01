@@ -47,24 +47,50 @@ module.exports= function (/*layers*/) {
 			return engine.errorHandler.apply(this,args);
 		}
 	}
+
 	// The real Zen Engine
 	var engine= function (/*handleArgs*/) {
 		var handleArgs=Array.prototype.slice.call(arguments);
 		var self=this;
 		var i=L;
+		
+		//handler optimization
+		var argLength=arguments.length;
+		function handle(handler){
+		switch (argLength) {
+				// fast cases
+				case 0:
+					return handler.call(self, next);
+					break;
+				case 1:
+					return handler.call(self, handleArgs[0],next);
+					break;
+				case 2:
+					return handler.call(self, handleArgs[0],handleArgs[1], next);
+					break;
+				case 3:
+					return handler.call(self, handleArgs[0],handleArgs[1], handleArgs[2],next);
+					break;
+				// slower
+				default:
+					return handler.apply(self, handleArgs);
+			}
+		};
+					
 		var next= function(err,res) {
 			if(err||res) {
-				handleArgs[handleArgs.length-1]=err; //overriding last arg
-				return nextHandler.apply(self,Array.prototype.concat(handleArgs,[res]));
+				//handleArgs[handleArgs.length-1]=err; //overriding last arg
+				return nextHandler.apply(self,Array.prototype.concat(handleArgs,[err,res]));
 			} else
-				return layers[--i].apply(self,handleArgs);
+				return handle(layers[--i]);
 		}
-		handleArgs.push(next);
+		
 		try {
-			return first.apply(self,handleArgs);
+			return handle(first);
 		} catch (err) {
-			handleArgs[handleArgs.length-1]=err; //overriding last arg
-			return handle.errorHandler.apply(self,handleArgs);
+			handleArgs.push(err);
+			//handleArgs[handleArgs.length-1]=err; //overriding last arg
+			return engine.errorHandler.apply(self,handleArgs);
 		}
 	}
 	engine.errorHandler = errorHandler;

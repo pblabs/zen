@@ -44,28 +44,28 @@ module.exports= function (/*layers*/) {
 			if (err) {
 				return engine.errorHandler(req, resp, err); //err
 			}
-			if (resp)
-				return engine.resultHandler(req, resp, res);
+			return engine.resultHandler(req, resp, res);
 		} catch (ex) {
 			return engine.errorHandler(req, resp, ex);
 		}
-		return;
 	}
+	
 	// The real Zen Engine
 	var engine= function (req, resp) {
 		var i=L;
-		try {
+		try {			
 			var next= function(err,res) {
-				if (err||res) //response optimization
-					return nextHandler(req,resp,err,res);
-				else
-					return layers[--i](req,resp,next);
+				if(!err&&!res) {					
+					return layers[--i](req,resp,next); 
+				} 
+				return nextHandler(req,resp,err,res);
 			}
 			return first(req,resp,next);
 		} catch (err) {
 			return engine.errorHandler(req, resp, err);
 		}
 	}
+	if (L==0){engine=first}; //no next
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	return engine;

@@ -38,10 +38,9 @@ module.exports= function (/*layers*/) {
 			if (err) {
 				args.push(err);
 				return engine.errorHandler.apply(this,args);
-			} else if (res) {
-				args.push(res);
-				return engine.resultHandler.apply(this,args);
-			}
+			} 
+			args.push(res);
+			return engine.resultHandler.apply(this,args);
 		} catch (ex) {
 			args.push(ex);
 			return engine.errorHandler.apply(this,args);
@@ -57,41 +56,45 @@ module.exports= function (/*layers*/) {
 		//handler optimization
 		var argLength=arguments.length;
 		try {
-		function handle(handler){	
-		switch (argLength) {
-				// fast cases
-				case 0:
-					return handler.call(self, next);
-					break;
-				case 1:
-					return handler.call(self, handleArgs[0],next);
-					break;
-				case 2:
-					return handler.call(self, handleArgs[0],handleArgs[1], next);
-					break;
-				case 3:
-					return handler.call(self, handleArgs[0],handleArgs[1], handleArgs[2],next);
-					break;
-				// slower
-				default:
-					return handler.apply(self, handleArgs);
-			}
-		};
-					
-		var next= function(err,res) {
-			if(err||res) {
+			function handle(handler){	
+				switch (argLength) {
+						// fast cases
+						case 0:
+							return handler.call(self, next);
+							break;
+						case 1:
+							return handler.call(self, handleArgs[0],next);
+							break;
+						case 2:
+							return handler.call(self, handleArgs[0],handleArgs[1], next);
+							break;
+						case 3:
+							return handler.call(self, handleArgs[0],handleArgs[1], handleArgs[2],next);							
+							break;
+						case 4:
+							return handler.call(self, handleArgs[0],handleArgs[1], handleArgs[2], handleArgs[3], next);							
+							break;
+							
+						// slower
+						default:
+							return handler.apply(self, handleArgs);
+					}
+				}
+						
+			var next= function(err,res) {
+				if(!err&&!res) {					
+					return handle(layers[--i]); 
+				} 
 				return nextHandler.apply(self,Array.prototype.concat(handleArgs,[err,res]));
-			} else
-				return handle(layers[--i]);
-		}
-		
-		
+			}
+				
 			return handle(first);
 		} catch (err) {
 			handleArgs.push(err);
 			return engine.errorHandler.apply(self,handleArgs);
 		}
 	}
+	if (L==0){engine=first}; //no next
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	return engine;

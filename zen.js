@@ -1,7 +1,7 @@
 /**
  * Default error handler
  */
-errorHandler = function error(/*args,*/ /*err*/) {
+var errorHandler = function error(/*args,*/ /*err*/) {
 	var err=(arguments.length >0)?arguments[arguments.length-1]:null;
 	if (typeof err == "undefined" || !err)
 		return console.error("Error:","This is the end, with no result given");
@@ -14,7 +14,7 @@ errorHandler = function error(/*args,*/ /*err*/) {
 /**
  * Default result handler
  */
-resultHandler = function result(/*args,*/ /*res*/) {
+var resultHandler = function result(/*args,*/ /*res*/) {
 	var res=(arguments.length >0)?arguments[arguments.length-1]:null;
 	return;
 };
@@ -56,7 +56,8 @@ module.exports= function (/*layers*/) {
 		
 		//handler optimization
 		var argLength=arguments.length;
-		function handle(handler){
+		try {
+		function handle(handler){	
 		switch (argLength) {
 				// fast cases
 				case 0:
@@ -79,17 +80,15 @@ module.exports= function (/*layers*/) {
 					
 		var next= function(err,res) {
 			if(err||res) {
-				//handleArgs[handleArgs.length-1]=err; //overriding last arg
 				return nextHandler.apply(self,Array.prototype.concat(handleArgs,[err,res]));
 			} else
 				return handle(layers[--i]);
 		}
 		
-		try {
+		
 			return handle(first);
 		} catch (err) {
 			handleArgs.push(err);
-			//handleArgs[handleArgs.length-1]=err; //overriding last arg
 			return engine.errorHandler.apply(self,handleArgs);
 		}
 	}

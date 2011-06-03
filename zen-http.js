@@ -5,7 +5,7 @@
 /**
  * Default error handler
  */
-errorHandler = function error(req, resp, err) {
+var errorHandler = function error(req, resp, err) {
 	if (err) {
 		resp.writeHead(500, {
 			"Content-Type": "text/plain"
@@ -21,7 +21,7 @@ errorHandler = function error(req, resp, err) {
 /**
  * Default result handler
  */
-resultHandler = function result(req, resp, result) {
+var resultHandler = function result(req, resp, result) {
 	resp.writeHead(200, {
 		"Content-Type": "octet/stream"
 	});

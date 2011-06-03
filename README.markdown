@@ -1,6 +1,6 @@
 # Zen
 
-<img src="https://github.com/pblabs/zen/blob/master/logo.png"> Z-engine (Zen) is the most simple, minimal, fast, full featured, general purpose javascript module stack engine.
+<img src="https://github.com/pblabs/zen/raw/master/logo.png"> Z-engine (Zen) is the most simple, minimal, fast, full featured, general purpose javascript module stack engine.
 
 It's like Ruby's Rack or Python WSGI, but in a Node.js environment.
 
@@ -13,7 +13,7 @@ Zen bundles optimized versions for specific purpose:
 
 Internal benchmarks show how Zen versions are faster than Stack and Stack2
 
-<img src="https://github.com/pblabs/zen/blob/master/results.png">
+<img src="https://github.com/pblabs/zen/raw/master/results.png">
 
 ## Install
 

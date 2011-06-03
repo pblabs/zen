@@ -1,13 +1,14 @@
-# Zen
+# <img src="https://github.com/pblabs/zen/raw/master/logo.png"> Zen
 
-<img src="https://github.com/pblabs/zen/raw/master/logo.png"> Z-engine (Zen) is the most simple, minimal, fast, full featured, general purpose javascript module stack engine.
+Z-engine (Zen) is the most simple, minimal, fast, full featured, general purpose javascript module stack engine.
 
-It's like Ruby's Rack or Python WSGI, but in a Node.js environment.
+It's like Ruby's Rack or Python WSGI, but for Node.js.
 
 ## Optimized version
 
 Zen bundles optimized versions for specific purpose:
-	- zen-http: a HTTP request,response module engine. Connect and Stack compatible, faster in real world use cases  
+
+- zen-http: a HTTP 'request,response' modules engine. Connect and Stack compatible, faster in real world use cases  
 
 ## Benchmarks
 
@@ -63,9 +64,9 @@ When using external modules we suggest to use the Setup Pattern, where the modul
 
 Zen does a few things under the hood.
 
- - Creates standalone module engines, escaping node's module caching. With this engines could be chained together.
+ - Creates standalone module engines, escaping node's module caching. With this, engines could be chained together.
  - Calls each module passing first given arguments. This means modules can "chain" partial result by reference (using object or array).
- - Returns any given value to parent handler. This means as long as application uses `return next();` value returned could be popped to the caller (useful for synchronous application stack).  
+ - Returns any given value to parent handler. This means as long as application uses `return next();` value returned could be popped to the caller (useful for synchronous application).  
  - Wraps modules in a `try..catch` to catch any exceptions that happen running the engine.
  - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module don't have to worry about errors from previous modules.
  - Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic  
@@ -82,4 +83,4 @@ errorHandler and resultHandler could be overridden by custom functions. As handl
 Due its general purpose, Zen does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
 
 ## Background
-Zen takes ideas from Connect, Stack and internal projects under construnction. 
+Zen takes ideas from Connect, Stack and internal projects under construction. 

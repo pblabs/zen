@@ -1,18 +1,18 @@
 # <img src="https://github.com/pblabs/zen/raw/master/logo.png"> Zen
 
-Z-engine (Zen) is the most simple, minimal, fast, full featured, general purpose javascript module stack engine.
+_Z-engine (Zen)_ is the most simple, minimal, fast, full featured, general purpose javascript module stack engine.
 
 It's like Ruby's Rack or Python WSGI, but for Node.js.
 
 ## Optimized version
 
-Zen bundles optimized versions for specific purpose:
+_Zen_ bundles optimized versions for specific purpose:
 
-- zen-http: a HTTP 'request,response' modules engine. Connect and Stack compatible, faster in real world use cases  
+ - zen-http: a HTTP 'request,response' modules engine. Connect and Stack compatible, faster in real world use cases  
 
 ## Benchmarks
 
-Internal benchmarks show how Zen versions are faster than Stack and Stack2
+Internal benchmarks show how _Zen_ versions are faster than Stack and Stack2
 
 <img src="https://github.com/pblabs/zen/raw/master/results.png">
 
@@ -35,7 +35,7 @@ If you don't use npm, then copy the single file `zen.js` somewhere you can get t
 
 ## Explanation
 
-Zen takes a list of handler functions and will chain them up by the next() method in a z-engine instance. 
+_Zen_ takes a list of handler functions and will chain them up by the next() method in a z-engine instance. 
 
 Each handler needs to be of the form:
 
@@ -47,7 +47,7 @@ Each handler needs to be of the form:
       // any exceptions need to be caught and forwarded to `next(err)`
 	  // result need to be forwarded with `next(null,res)`	
 
-	  // without a call to `next` Zen "drops" the chain  
+	  // without a call to `next` _Zen_ "drops" the chain  
     }
 
 
@@ -62,10 +62,10 @@ When using external modules we suggest to use the Setup Pattern, where the modul
 
 ## What Zen Does
 
-Zen does a few things under the hood.
+_Zen_ does a few things under the hood.
 
  - Creates standalone module engines. Multiple engines could be chained together.
- - Zen uses<a href='http://en.wikipedia.org/wiki/Continuation-passing_style'>continuation passing style</a>, but as long as an application stack uses `return next();` value returned from handle functions could be assigned to the caller.  
+ - Uses <a href='http://en.wikipedia.org/wiki/Continuation-passing_style'>continuation passing style</a>, but as long as an application stack uses `return next();` value returned from handle functions could be assigned to the caller.  
  - Wraps modules in a `try..catch` to catch any exceptions that happen running the engine.
  - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module don't have to worry about errors from previous modules.
  - Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic  
@@ -79,7 +79,15 @@ errorHandler and resultHandler could be overridden by custom functions. As handl
 
 ## What Zen Does NOT Do
 
-Due its general purpose, Zen does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
+Due its general purpose, _Zen_ does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
 
-## Background
-Zen takes ideas from Connect, Stack and internal projects under construction. 
+# Conclusion
+
+_Zen_is available on github <a href='https://github.com/plabs/zen'>here</a>
+under <a href='https://github.com/plabs/zen/blob/master/MIT-LICENSE.txt'>MIT license</a>.
+If you hit bugs, fill issues on github.
+Feel free to fork, modify and have fun with it :)
+
+## Credits
+
+_Zen_ takes ideas from Connect, Stack and internal projects under construction. 

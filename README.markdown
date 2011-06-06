@@ -64,9 +64,8 @@ When using external modules we suggest to use the Setup Pattern, where the modul
 
 Zen does a few things under the hood.
 
- - Creates standalone module engines, escaping node's module caching. With this, engines could be chained together.
- - Calls each module passing first given arguments. This means modules can "chain" partial result by reference (using object or array).
- - Returns any given value to parent handler. This means as long as application uses `return next();` value returned could be popped to the caller (useful for synchronous application).  
+ - Creates standalone module engines. Multiple engines could be chained together.
+ - Zen uses<a href='http://en.wikipedia.org/wiki/Continuation-passing_style'>continuation passing style</a>, but as long as an application stack uses `return next();` value returned from handle functions could be assigned to the caller.  
  - Wraps modules in a `try..catch` to catch any exceptions that happen running the engine.
  - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module don't have to worry about errors from previous modules.
  - Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic  

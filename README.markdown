@@ -33,11 +33,10 @@ Each handler needs to be of the form:
 
 	  // next uses node.js callback convention: 
       // any exceptions need to be caught and forwarded to `next(err)`
-	  // result need to be forwarded with `next(null,res)`	
+	  // result needs to be forwarded with `next(null,res)`	
 
 	  // without a call to `next` _Zen_ "drops" the chain  
     }
-
 
 When using external modules we suggest to use the Setup Pattern, where the module is a callable function that returns the handler function.  
 
@@ -71,7 +70,7 @@ Due its general purpose, _Zen_ does not provide any middleware modules of any ki
 
 # Triadic subscriptions
 
-The Book Clean Code (http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) states (@ chapter #3): 
+The Book Clean Code (http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) states (on chapter #3): 
 	
 	The ideal number of arguments for a function is zero (niladic). 
 	Next comes one (monadic), followed closely by two (dyadic). 
@@ -80,6 +79,7 @@ The Book Clean Code (http://www.amazon.com/Clean-Code-Handbook-Software-Craftsma
 
 If you need multiple arguments there is a big chance that the method is doing more than it should or that you could abstract
 the operation better. Mind the Javascript objects!!! 
+
 Keep classes and functions as small as possible, break it into multiple "modules"... it is usually easier to 
 understand what is going on.
 

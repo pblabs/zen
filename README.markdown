@@ -69,13 +69,14 @@ errorHandler and resultHandler could be overridden by custom functions. As handl
 
 Due its general purpose, _Zen_ does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
 
-#_Triadic subscriptions
+# Triadic subscriptions
 
 The Book Clean Code (http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) states (@ chapter #3): 
-	`The ideal number of arguments for a function is zero (niladic). 
+	
+	The ideal number of arguments for a function is zero (niladic). 
 	Next comes one (monadic), followed closely by two (dyadic). 
 	Three arguments (triadic) should be avoided where possible. 
-	More than three (polyadic) requires very special justification -- and then shouldn't be used anyway.` 
+	More than three (polyadic) requires very special justification -- and then shouldn't be used anyway.
 
 If you need multiple arguments there is a big chance that the method is doing more than it should or that you could abstract
 the operation better. Mind the Javascript objects!!! 

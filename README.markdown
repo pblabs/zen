@@ -4,18 +4,6 @@ _Z-engine (Zen)_ is the most simple, minimal, fast, full featured, general purpo
 
 It's like Ruby's Rack or Python WSGI, but for Node.js.
 
-## Optimized version
-
-_Zen_ bundles optimized versions for specific purpose:
-
- - zen-http: a HTTP 'request,response' modules engine. Connect and Stack compatible, faster in real world use cases  
-
-## Benchmarks
-
-Internal benchmarks show how _Zen_ versions are faster than Stack and Stack2
-
-<img src="https://github.com/pblabs/zen/raw/master/results.png">
-
 ## Install
 
 If you use npm, then install zen via npm. 
@@ -80,6 +68,28 @@ errorHandler and resultHandler could be overridden by custom functions. As handl
 ## What Zen Does NOT Do
 
 Due its general purpose, _Zen_ does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
+
+#_Triadic subscriptions
+
+The Book Clean Code (http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) states (@ chapter #3): 
+	`The ideal number of arguments for a function is zero (niladic). 
+	Next comes one (monadic), followed closely by two (dyadic). 
+	Three arguments (triadic) should be avoided where possible. 
+	More than three (polyadic) requires very special justification -- and then shouldn't be used anyway.` 
+
+If you need multiple arguments there is a big chance that the method is doing more than it should or that you could abstract
+the operation better. Mind the Javascript objects!!! 
+Keep classes and functions as small as possible, break it into multiple "modules"... it is usually easier to 
+understand what is going on.
+
+_zen-http_ is _Zen_ for triadic handlers, includes proper result and error handlers and default 404 response. Connect and Stack compatible, really faster in real world use cases.
+Use `next(err)` to push a 500 error message to the client, `next(null,result)` to send the result with status 200.
+
+## Benchmarks
+
+Internal benchmarks show how _Zen_ versions are faster than Stack and Stack2
+
+<img src="https://github.com/pblabs/zen/raw/master/results.png">
 
 # Conclusion
 

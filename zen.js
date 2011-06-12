@@ -16,6 +16,7 @@ var errorHandler = function error(/*args,*/ /*err*/) {
  */
 var resultHandler = function result(/*args,*/ /*res*/) {
 	var res=(arguments.length >0)?arguments[arguments.length-1]:null;
+	if (res) console.log(res);
 	return;
 };
 /**
@@ -24,41 +25,41 @@ var resultHandler = function result(/*args,*/ /*res*/) {
 module.exports= function (/*layers*/) {
 	var error = function(/*args*/) {
 		return engine.errorHandler.apply(this,arguments);
-	},
-	layers=Array.prototype.concat([error],Array.prototype.slice.call(arguments).reverse());
+	};
+	var layers=Array.prototype.concat([],Array.prototype.slice.call(arguments).reverse());
 
 	var L=layers.length-1;
-	var first=layers[L]; //first access optimization
+	//var first=layers[L]; //first access optimization
 
 	var nextHandler= function(/* args, err, res */) {
 		var args=Array.prototype.slice.call(arguments);
 		var res=args.pop();
 		var err=args.pop();
 		try {
-			if (err) {
-				args.push(err);
-				return engine.errorHandler.apply(this,args);
+			if (res) {
+				args.push(res);
+				return engine.resultHandler.apply(this,args);
 			} 
-			args.push(res);
-			return engine.resultHandler.apply(this,args);
+			args.push(err);			
 		} catch (ex) {
 			args.push(ex);
+		} finally {
 			return engine.errorHandler.apply(this,args);
 		}
 	}
+
 
 	// The real Zen Engine
 	var engine= function (/*handleArgs*/) {
 		var handleArgs=Array.prototype.slice.call(arguments);
 		var self=this;
 		var i=L;
-		
 		//handler optimization
 		var argLength=arguments.length;
 		try {
-			function handle(handler){	
+			function handle(handler){
 				switch (argLength) {
-						// fast cases
+						// faster 
 						case 0:
 							return handler.call(self, next);
 							break;
@@ -81,20 +82,20 @@ module.exports= function (/*layers*/) {
 					}
 				}
 						
-			var next= function(err,res) {
+			function next (err,res) {
 				if(!err&&!res) {					
-					return handle(layers[--i]); 
+					if (i>=0) return handle(layers[i--]);
+					err=""; 
 				} 
 				return nextHandler.apply(self,Array.prototype.concat(handleArgs,[err,res]));
-			}
-				
-			return handle(first);
+			}								
+			return handle(layers[i--]);
 		} catch (err) {
 			handleArgs.push(err);
 			return engine.errorHandler.apply(self,handleArgs);
 		}
 	}
-	if (L==0){engine=first}; //no next
+	if (L<0){engine=error}; //default
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	return engine;

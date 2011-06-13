@@ -19,37 +19,30 @@ var resultHandler = function result(/*args,*/ /*res*/) {
 	if (res) console.log(res);
 	return;
 };
+
+
 /**
  * Zen uses a 'setup' pattern, returning a callable engine function
  */
 module.exports= function (/*layers*/) {
+	/**
+	 * Default handler delegates to the error handler
+	 */
 	var defaultHandler = function(/*args*/) {
-		return engine.errorHandler.apply(this,Array.prototype.concat(Array.prototype.slice.call(arguments),[undefined]));
+		var arg= Array.prototype.slice.call(arguments);
+		arg.push(undefined);//err
+		return engine.errorHandler.apply(this,arg);
 	};
-	var layers=Array.prototype.concat([defaultHandler],Array.prototype.slice.call(arguments).reverse());
-
+	
+	var layers=Array.prototype.slice.call(arguments).reverse();	
 	var L=layers.length-1;
-	//var first=layers[L]; //first access optimization
-
-	var nextHandler= function(/* args, err, res */) {
-		var args=Array.prototype.slice.call(arguments);
-		var res=args.pop(); //last
-		var err=args.pop();
-		if (res) {
-			args.push(res);
-			return engine.resultHandler.apply(this,args);
-		} 
-		args.push(err);			
-		return engine.errorHandler.apply(this,args);
-	}
-
-
+		
 	// The real Zen Engine
 	var engine= function (/*handleArgs*/) {
 		var handleArgs=Array.prototype.slice.call(arguments);
 		var self=this;
 		var i=L;
-		
+				
 		//handler optimization
 		var argLength=arguments.length;
 		try {
@@ -74,22 +67,36 @@ module.exports= function (/*layers*/) {
 							
 						// slower
 						default:
-							return handler.apply(self, handleArgs);
+							var nextedArgs=Array.prototype.slice.call(handleArgs);
+							nextedArgs.push(next)							
+							return handler.apply(self, nextedArgs);
 					}
-				}
+			}
 						
 			function next (err,res) {
-				if(!err&&!res) {					
-					return handle(layers[--i]);
+				if(!res&&!err) {					
+					if (--i>=0) return handle(layers[i]);
 				} 
-				return nextHandler.apply(self,Array.prototype.concat(handleArgs,[err,res]));
-			}											
+				if (res) {
+					handleArgs.push(res);
+					return engine.resultHandler.apply(this,handleArgs);
+				}
+				handleArgs.push(err);
+				return engine.errorHandler.apply(this,handleArgs);		
+			}
+														
 			return handle(layers[i]);
 		} catch (err) {
-			return engine.errorHandler.apply(self,Array.prototype.concat(handleArgs,err));
+			handleArgs.push(err);
+			try{
+			return engine.errorHandler.apply(self,handleArgs);
+			} catch(ex) {
+				handleArgs[handleArgs.length-1]=ex;
+				return errorHandler.apply(self,handleArgs);
+			}
 		}
 	}
-	if (L<=0){engine=defaultHandler}; //default
+	if (L<0){engine=defaultHandler}; //default
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	return engine;

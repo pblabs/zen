@@ -57,13 +57,14 @@ this.core = {
   	},	
   '5. Zen should run with parameter and without handler ': function (test) {	
 	var zapp=zen();
-	zapp.errorHandler=function(value1){
-		test.ok(arguments.length===1, 'The handler was executed with the correct number of arguments');
+	zapp.errorHandler=function(value1,err){
+		test.ok(arguments.length===2, 'The handler was executed with the correct number of arguments');
 		test.ok(typeof value1 !== 'undefined', 'The handler was executed with the value `' + value1 + '`.');
+		test.ok(typeof err === 'undefined', 'The handler was executed with the value `' + err + '`.');
 	};		
 	zapp(1);
 
-	test.expect(2);
+	test.expect(3);
     test.done();
 	
   	},

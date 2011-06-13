@@ -7,27 +7,27 @@
  */
 var errorHandler = function error(req, resp, err) {
 	if (err) {
-		resp.writeHead(500, {
+		if (resp.writeHead) resp.writeHead(500, {
 			"Content-Type": "text/plain"
 		});
-		resp.end(err.stack + "\n");
+		if (resp.end) resp.end(err.stack + "\n");
 		console.error(err.stack + "\n");
 		return;
 	}
-	resp.writeHead(404, {
+	if (resp.writeHead) resp.writeHead(404, {
 		"Content-Type": "text/plain"
 	});
-	resp.end("Not Found\n");
+	if (resp.end) resp.end("Not Found\n");
 	console.log("Not Found\n");
 };
 /**
  * Default result handler
  */
 var resultHandler = function result(req, resp, result) {
-	resp.writeHead(200, {
+	if (resp.writeHead) resp.writeHead(200, {
 		"Content-Type": "octet/stream"
 	});
-	resp.end(result);
+	if (resp.end) resp.end(result);
 	console.log("result");
 };
 /**

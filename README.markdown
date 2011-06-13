@@ -1,6 +1,6 @@
 # <img src="https://github.com/pblabs/zen/raw/master/logo.png"> Zen
 
-_Z-engine (Zen)_ is the most simple, minimal, fast, full featured, general purpose javascript module stack engine.
+_Z-engine (Zen)_ is the most simple, safe, minimal, fast, full featured, general purpose javascript module stack engine.
 
 It's like Ruby's Rack or Python WSGI, but for Node.js.
 
@@ -14,12 +14,12 @@ If you don't use npm, then copy the single file `zen.js` somewhere you can get t
 
 ## How to use
 
-	var zenInstance=require('../zen')(
+	var zapp=require('../zen')(
 	  require('firstHandler')(),
       require('secondHandler')(handleArg1, handleArg2),
 	);
 	
-	var result = zenInstance(<proper>, <application>, <args>); 
+	var result = zapp(<proper>, <application>, <args>); 
 
 ## Explanation
 
@@ -52,16 +52,16 @@ When using external modules we suggest to use the Setup Pattern, where the modul
 _Zen_ does a few things under the hood.
 
  - Creates standalone module engines. Multiple engines could be chained together.
- - Uses <a href='http://en.wikipedia.org/wiki/Continuation-passing_style'>continuation passing style</a>, but as long as an application stack uses `return next();` value returned from handle functions could be assigned to the caller.  
- - Wraps modules in a `try..catch` to catch any exception that happens running the engine.
+ - Uses <a href='http://en.wikipedia.org/wiki/Continuation-passing_style'>continuation passing style</a>, but as long as an application stack uses `return next();` value returned from handle functions could be assigned to the caller.
+ - Wraps handlers in a `try..catch` to catch any exception that happens running the engine.
  - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module don't have to worry about errors from previous modules.
  - Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic  
 
 errorHandler and resultHandler could be overridden by custom functions. As handler above these needs to be of the form:
 
-	zenInstance.errorHandler = function(<proper>, <application>, <args>, err) {
+	zapp.errorHandler = function(<proper>, <application>, <args>, err) {
 	}
-	zenInstance.resultHandler= function(<proper>, <application>, <args>, res) {
+	zapp.resultHandler= function(<proper>, <application>, <args>, res) {
 	}
 
 ## What Zen Does NOT Do
@@ -70,7 +70,7 @@ Due its general purpose, _Zen_ does not provide any middleware modules of any ki
 
 # Triadic subscriptions
 
-The Book Clean Code (http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) states (on chapter #3): 
+The Book <a href="http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882">Clean Code</a> states (on chapter #3): 
 	
 	The ideal number of arguments for a function is zero (niladic). 
 	Next comes one (monadic), followed closely by two (dyadic). 
@@ -96,7 +96,9 @@ Internal benchmarks show how _Zen_ versions are faster than Stack and Stack2
 
 _Zen_ is available on github <a href='https://github.com/plabs/zen'>here</a>
 under <a href='https://github.com/plabs/zen/blob/master/MIT-LICENSE.txt'>MIT license</a>.
-If you hit bugs, fill issues on github.
+
+If you found bugs, please fill issues on github.
+
 Feel free to fork, modify and have fun with it :)
 
 ## Credits

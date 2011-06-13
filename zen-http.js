@@ -1,5 +1,5 @@
 /**
- * Zen for triadic handler. Plus proper http error handling and responder 
+ * Zen for triadic handler. Plus proper http error handling and responder
  */
 
 /**
@@ -11,12 +11,14 @@ var errorHandler = function error(req, resp, err) {
 			"Content-Type": "text/plain"
 		});
 		resp.end(err.stack + "\n");
+		console.error(err.stack + "\n");
 		return;
 	}
 	resp.writeHead(404, {
 		"Content-Type": "text/plain"
 	});
 	resp.end("Not Found\n");
+	console.log("Not Found\n");
 };
 /**
  * Default result handler
@@ -26,46 +28,48 @@ var resultHandler = function result(req, resp, result) {
 		"Content-Type": "octet/stream"
 	});
 	resp.end(result);
+	console.log("result");
 };
 /**
  * Zen uses a 'setup' pattern, returning a callable engine function
  */
-module.exports= function (/*layers*/) {
-	var error = function(a, b, err) {
-		return engine.errorHandler(a, b, err);
-	};
-	var layers=Array.prototype.concat([error],Array.prototype.slice.call(arguments).reverse());
-
-	var L=layers.length-1;
-	var first=layers[L];//first access optimization
-
-	var nextHandler= function(a,b,err,res) {
+module.exports= function (/*handlers*/) {
+	/**
+	 * Default handler delegates to the error handler
+	 */
+	var defaultHandler = function(a,b) {
 		try {
-			if (err) {
-				return engine.errorHandler(a, b, err); //err
-			}
-			return engine.resultHandler(a, b, res);
+			return engine.errorHandler(a,b,undefined); //explicit undef error passing
 		} catch (ex) {
-			return engine.errorHandler(a, b, ex);
+			return errorHandler(a,b,ex);
 		}
-	}
-	
+	};
+	var handlers=Array.prototype.slice.call(arguments).reverse();
+	var L=handlers.length-1;
 	// The real Zen Engine
 	var engine= function (a,b) {
 		var i=L;
-		try {			
-			var next= function(err,res) {
-				if(!err&&!res) {					
-					return layers[--i](a,b,next); 
-				} 
-				return nextHandler(a,b,err,res);
+		try {
+			function next (err,res) {
+				if(!res&&!err) {
+					if (--i>=0)
+						return handlers[i](a,b,next);
+				} else if (res)
+					return engine.resultHandler(a,b,res)
+				return engine.errorHandler(a,b,err);
 			}
-			return first(a,b,next);
+
+			return handlers[i](a,b,next);
 		} catch (err) {
-			return engine.errorHandler(a, b, err);
+			try {
+				return engine.errorHandler(a,b, err);
+			} catch (ex) {
+				return errorHandler(a,b,ex);
+			}
 		}
 	}
-	if (L==0){engine=first}; //no next
+	if (L<0)
+		engine=defaultHandler; //default
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	return engine;

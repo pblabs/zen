@@ -11,12 +11,14 @@ var errorHandler = function error(req, resp, err) {
 			"Content-Type": "text/plain"
 		});
 		resp.end(err.stack + "\n");
+		console.error(err.stack + "\n");
 		return;
 	}
 	resp.writeHead(404, {
 		"Content-Type": "text/plain"
 	});
 	resp.end("Not Found\n");
+	console.log("Not Found\n");
 };
 /**
  * Default result handler
@@ -26,45 +28,48 @@ var resultHandler = function result(req, resp, result) {
 		"Content-Type": "octet/stream"
 	});
 	resp.end(result);
+	console.log("result");
 };
-
-
 /**
  * Zen uses a 'setup' pattern, returning a callable engine function
  */
-module.exports= function (/*layers*/) {
+module.exports= function (/*handlers*/) {
 	/**
 	 * Default handler delegates to the error handler
 	 */
 	var defaultHandler = function(req, resp) {
-		return engine.errorHandler(req, resp);
+		try {
+			return engine.errorHandler(req, resp,undefined); //explicit undef error passing
+		} catch (ex) {
+			return errorHandler(req,resp,ex);
+		}
 	};
-	var layers=Array.prototype.slice.call(arguments).reverse();
-
-	var L=layers.length-1;
-	
+	var handlers=Array.prototype.slice.call(arguments).reverse();
+	var L=handlers.length-1;
 	// The real Zen Engine
 	var engine= function (req, resp) {
 		var i=L;
-		try {			
-			var next= function(err,res) {
-				if(!err&&!res) {					
-					if (--i>=0) return layers[i](req,resp,next); 
-				} 
-				if (res) 
-					return engine.resultHandler(req,resp,res)				
+		try {
+			function next (err,res) {
+				if(!res&&!err) {
+					if (--i>=0)
+						return handlers[i](req,resp,next);
+				} else if (res)
+					return engine.resultHandler(req,resp,res)
 				return engine.errorHandler(req,resp,err);
 			}
-			return layers[i](req,resp,next);
+
+			return handlers[i](req,resp,next);
 		} catch (err) {
-			try{
+			try {
 				return engine.errorHandler(req, resp, err);
 			} catch (ex) {
 				return errorHandler(req,resp,ex);
 			}
 		}
 	}
-	if (L<0){engine=defaultHandler}; //default
+	if (L<0)
+		engine=defaultHandler; //default
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	return engine;

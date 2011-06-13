@@ -27,28 +27,21 @@ var resultHandler = function result(req, resp, result) {
 	});
 	resp.end(result);
 };
+
+
 /**
  * Zen uses a 'setup' pattern, returning a callable engine function
  */
 module.exports= function (/*layers*/) {
-	var error = function(req, resp, err) {
-		return engine.errorHandler(req, resp, err);
+	/**
+	 * Default handler delegates to the error handler
+	 */
+	var defaultHandler = function(req, resp) {
+		return engine.errorHandler(req, resp);
 	};
-	var layers=Array.prototype.concat([error],Array.prototype.slice.call(arguments).reverse());
+	var layers=Array.prototype.slice.call(arguments).reverse();
 
 	var L=layers.length-1;
-	var first=layers[L];//first access optimization
-
-	var nextHandler= function(req,resp,err,res) {
-		try {
-			if (err) {
-				return engine.errorHandler(req, resp, err); //err
-			}
-			return engine.resultHandler(req, resp, res);
-		} catch (ex) {
-			return engine.errorHandler(req, resp, ex);
-		}
-	}
 	
 	// The real Zen Engine
 	var engine= function (req, resp) {
@@ -56,16 +49,22 @@ module.exports= function (/*layers*/) {
 		try {			
 			var next= function(err,res) {
 				if(!err&&!res) {					
-					return layers[--i](req,resp,next); 
+					if (--i>=0) return layers[i](req,resp,next); 
 				} 
-				return nextHandler(req,resp,err,res);
+				if (res) 
+					return engine.resultHandler(req,resp,res)				
+				return engine.errorHandler(req,resp,err);
 			}
-			return first(req,resp,next);
+			return layers[i](req,resp,next);
 		} catch (err) {
-			return engine.errorHandler(req, resp, err);
+			try{
+				return engine.errorHandler(req, resp, err);
+			} catch (ex) {
+				return errorHandler(req,resp,ex);
+			}
 		}
 	}
-	if (L==0){engine=first}; //no next
+	if (L<0){engine=defaultHandler}; //default
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	return engine;

@@ -68,6 +68,15 @@ errorHandler and resultHandler could be overridden by custom functions. As handl
 
 Due its general purpose, _Zen_ does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
 
+## API
+
+`zen.errorHandler` : this is the default request handler and the called handler on errors. Must be a function.
+When an `errorHandler` throws exception, this is catched by the original errorHandler (that prints on console).
+`zen.resultHandler` : this is the result handler. When it throws execption this is catched by the `errorHandler`.   
+`zen.pause` : pauses the engine and buffers the requests.
+`zen.stop` : stops the engine, requests will be forwarded to the errorHandler.
+`zen.resume` : resumes the engine and flushes the requests buffer on the engine.
+
 # Triadic subscriptions
 
 The Book <a href="http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882">Clean Code</a> states (on chapter #3): 
@@ -83,7 +92,7 @@ the operation better. Mind the Javascript objects!!!
 Keep classes and functions as small as possible, break it into multiple "modules"... it is usually easier to 
 understand what is going on.
 
-_zen-http_ is _Zen_ for triadic handlers, includes proper result and error handlers and default 404 response. Connect and Stack compatible, really faster in real world use cases.
+_zen-http_ is _Zen_ for triadic handlers. It includes proper HTTP result and error handlers and default 404 response. Connect and Stack compatible, really faster in real world use cases.
 Use `next(err)` to push a 500 error message to the client, `next(null,result)` to send the result with status 200.
 
 ## Benchmarks

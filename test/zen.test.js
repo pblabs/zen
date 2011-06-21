@@ -287,4 +287,38 @@ this.core = {
     test.done();
 
 	},
+	'20. Zen should resolve paused requests on resume ': function (test) {
+	var hw=function(a,next){next(null,'result')};
+	var zapp=zen(hw);
+	zapp.pause();
+
+	zapp.errorHandler=function(a,err){test.ok(false, 'The errorHandler was executed');}; 
+	zapp.resultHandler=function(a,res){test.ok(true, 'The resultHandler was executed');};		
+	
+	zapp(1);
+	zapp(2);
+	zapp(3);
+	zapp.resume();	
+
+	test.expect(3);
+    test.done();
+
+	},
+	'21. Zen should delegate to errorHandler when stopped ': function (test) {
+	var hw=function(a,next){next(null,'result')};
+	var zapp=zen(hw);
+
+	zapp.errorHandler=function(err){test.ok(true, 'The errorHandler was executed');}; 
+	zapp.resultHandler=function(res){test.ok(true, 'The resultHandler was executed');};		
+	
+	zapp(1);
+	zapp.stop();
+	zapp(2);
+	zapp.resume();
+	zapp(3);	
+
+	test.expect(3);
+    test.done();
+
+	},
 };

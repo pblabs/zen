@@ -44,8 +44,16 @@ module.exports= function (/*handlers*/) {
 	};
 	var handlers=Array.prototype.slice.call(arguments).reverse();
 	var L=handlers.length-1;
+	
+	var _engineRequests=[];
+	var _enginePaused=false;
+	var _engineStopped=false;
 	// The real Zen Engine
 	var engine= function (/*handleArgs*/) {
+		
+		if (_enginePaused===true) {_engineRequests.push(Array.prototype.slice.call(arguments));return;}
+		if (_engineStopped===true) {return defaultHandler.apply(this,Array.prototype.slice.call(arguments));}
+		
 		var i=L;
 		try {
 			var handleArgs=Array.prototype.slice.call(arguments);
@@ -94,11 +102,12 @@ module.exports= function (/*handlers*/) {
 			return handle(handlers[i]);
 		} catch (err) {
 			try {
+				console.log(err.stack);
 				handleArgs.push(err);
-				return engine.errorHandler.apply(self,handleArgs);
+				return engine.errorHandler.apply(this,handleArgs);
 			} catch (ex) {
 				handleArgs[handleArgs.length-1]=ex;
-				return errorHandler.apply(self,handleArgs);
+				return errorHandler.apply(this,handleArgs);
 			}
 		}
 	}
@@ -106,5 +115,21 @@ module.exports= function (/*handlers*/) {
 		engine=defaultHandler; //default
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
+	
+	/*EXTRA FEATURE*/
+	engine.pause=function (){_enginePaused=true;};	
+	engine.stop =function (){_engineStopped=true;};	
+	engine.resume=function(){
+		_enginePaused=_engineStopped=false;
+		var requests= Array.prototype.slice.call(_engineRequests);
+		_engineRequests=[];
+		var request=requests.shift();
+		while(typeof request !=='undefined'){
+			engine.apply(this,request);
+			request=requests.shift();
+		}		
+	};
+
+	
 	return engine;
 };

@@ -6,7 +6,7 @@ It's like Ruby's Rack or Python WSGI, but for Node.js.
 
 ## Install
 
-If you use npm, then install zen via npm. 
+As simple as
 
     npm install zen
 
@@ -54,7 +54,7 @@ _Zen_ does a few things under the hood.
  - Creates standalone module engines. Multiple engines could be chained together.
  - Uses <a href='http://en.wikipedia.org/wiki/Continuation-passing_style'>continuation passing style</a>, but as long as an application stack uses `return next();` value returned from handle functions could be assigned to the caller.
  - Wraps handlers in a `try..catch` to catch any exception that happens running the engine.
- - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module don't have to worry about errors from previous modules.
+ - Forwards errors and exceptions passed to any next module directly to the error handler.  This means module doesn't have to worry about errors from previous modules.
  - Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic  
 
 errorHandler and resultHandler could be overridden by custom functions. As handler above these needs to be of the form:
@@ -66,13 +66,13 @@ errorHandler and resultHandler could be overridden by custom functions. As handl
 
 ## What Zen Does NOT Do
 
-Due its general purpose, _Zen_ does not provide any middleware modules of any kind. Take a look at http://github.com/pblabs/zen-garden 
+Due its general purpose, _Zen_ does not provide any middleware modules of any kind.
 
 ## API
 
  - `zapp.errorHandler` : this is the default request handler and the called handler on errors. Must be a function.
 When an `errorHandler` throws exception, this is catched by the original errorHandler (that prints on console).
- - `zapp.resultHandler` : this is the result handler. When it throws execption this is catched by the `errorHandler`.   
+ - `zapp.resultHandler` : this is the result handler. When it throws exception this is catched by the `errorHandler`.   
  - `zapp.pause` : pauses the engine and buffers the requests.
  - `zapp.stop` : stops the engine, requests will be forwarded to the errorHandler.
  - `zapp.resume` : resumes the engine and flushes the requests buffer on the engine.
@@ -92,7 +92,7 @@ the operation better. Mind the Javascript objects!!!
 Keep classes and functions as small as possible, break it into multiple "modules"... it is usually easier to 
 understand what is going on.
 
-_zen-http_ is _Zen_ for triadic handlers. It includes proper HTTP result and error handlers and default 404 response. Connect and Stack compatible, really faster in real world use cases.
+_zen-http_ is a special flavour of _Zen_ for triadic handlers. It includes proper HTTP result and error handlers and default 404 response. Connect and Stack compatible, a lot faster in real world use cases.
 Use `next(err)` to push a 500 error message to the client, `next(null,result)` to send the result with status 200.
 
 ## Benchmarks

@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Zen by pblabs</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Zen</h1>
+        <p>Zen is a simple, basic, fast, general purpose, module stack engine for node.js.</p>
+        <p class="view"><a href="https://github.com/pblabs/zen">View the Project on GitHub <small>pblabs/zen</small></a></p>
+        <ul>
+          <li><a href="https://github.com/pblabs/zen/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/pblabs/zen/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/pblabs/zen">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Zen</h1>
+
+<p><em>Z-engine (Zen)</em> is the most simple, safe, minimal, fast, full featured, general purpose javascript module stack engine.</p>
+
+<p>It's like Ruby's Rack or Python WSGI, but for Node.js.</p>
+
+<h2>Install</h2>
+
+<p>As simple as</p>
+
+<pre><code>npm install zen
+</code></pre>
+
+<p>If you don't use npm, then copy the single file <code>zen.js</code> somewhere you can get to it.   </p>
+
+<h2>How to use</h2>
+
+<pre><code>var zapp=require('../zen')(
+  require('firstHandler')(),
+  require('secondHandler')(handleArg1, handleArg2),
+);
+
+var result = zapp(&lt;proper&gt;, &lt;application&gt;, &lt;args&gt;); 
+</code></pre>
+
+<h2>Explanation</h2>
+
+<p><em>Zen</em> takes a list of handler functions and will chain them up by the next() method in a z-engine instance. </p>
+
+<p>Each handler needs to be of the form:</p>
+
+<pre><code>function handler(&lt;proper&gt;, &lt;application&gt;, &lt;args&gt;, next) {
+  // Either handle the request here using the arguments
+  // or call `next()` to pass control to next module
+
+  // next uses node.js callback convention: 
+  // any exceptions need to be caught and forwarded to `next(err)`
+  // result needs to be forwarded with `next(null,res)` 
+
+  // without a call to `next` _Zen_ "drops" the chain  
+}
+</code></pre>
+
+<p>When using external modules we suggest to use the Setup Pattern, where the module is a callable function that returns the handler function.  </p>
+
+<pre><code>module.exports = function setup(&lt;some&gt;, &lt;useful&gt;, &lt;setup&gt;, args) {
+  // Do module setup stuff here
+  return function handler(&lt;proper&gt;, &lt;application&gt;, &lt;args&gt;, next) {
+    // Handle a request here
+  };
+};
+</code></pre>
+
+<h2>What Zen Does</h2>
+
+<p><em>Zen</em> does a few things under the hood.</p>
+
+<ul>
+<li>Creates standalone module engines. Multiple engines could be chained together.</li>
+<li>Uses <a href="http://en.wikipedia.org/wiki/Continuation-passing_style">continuation passing style</a>, but as long as an application stack uses <code>return next();</code> value returned from handle functions could be assigned to the caller.</li>
+<li>Wraps handlers in a <code>try..catch</code> to catch any exception that happens running the engine.</li>
+<li>Forwards errors and exceptions passed to any next module directly to the error handler.  This means module doesn't have to worry about errors from previous modules.</li>
+<li>Forwards result passed to any next module directly to the result handler. This avoids generic result handling in module's business logic<br>
+</li>
+</ul><p>errorHandler and resultHandler could be overridden by custom functions. As handler above these needs to be of the form:</p>
+
+<pre><code>zapp.errorHandler = function(&lt;proper&gt;, &lt;application&gt;, &lt;args&gt;, err) {
+}
+zapp.resultHandler= function(&lt;proper&gt;, &lt;application&gt;, &lt;args&gt;, res) {
+}
+</code></pre>
+
+<h2>What Zen Does NOT Do</h2>
+
+<p>Due its general purpose, <em>Zen</em> does not provide any middleware modules of any kind.</p>
+
+<h2>API</h2>
+
+<ul>
+<li>
+<code>zapp.errorHandler</code> : this is the default request handler and the called handler on errors. Must be a function.
+When a <code>Handler</code> throws exception, this is catched by the original errorHandler (that prints on console).</li>
+<li>
+<code>zapp.resultHandler</code> : this is the result handler. When it throws exception this is catched by the <code>errorHandler</code>.<br>
+</li>
+<li>
+<code>zapp.pause</code> : pauses the engine and buffers the requests.</li>
+<li>
+<code>zapp.stop</code> : stops the engine, requests will be forwarded to the errorHandler.</li>
+<li>
+<code>zapp.resume</code> : resumes the engine and flushes the requests buffer on the engine.</li>
+</ul><h1>Triadic subscriptions</h1>
+
+<p>The Book <a href="http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882">Clean Code</a> states: </p>
+
+<pre><code>The ideal number of arguments for a function is zero (niladic). 
+Next comes one (monadic), followed closely by two (dyadic). 
+Three arguments (triadic) should be avoided where possible. 
+More than three (polyadic) requires very special justification -- and then shouldn't be used anyway.
+</code></pre>
+
+<p>If you need multiple arguments there is a big chance that the method is doing more than it should or that you could abstract
+the operation better. Mind the Javascript objects!!! </p>
+
+<p>Keep classes and functions as small as possible, break it into multiple "modules"... it is usually easier to 
+understand what is going on.</p>
+
+<p><em>zen-http</em> is a special flavour of <em>Zen</em> for triadic handlers. It includes proper HTTP result and error handlers and default 404 response. Connect and Stack compatible, a lot faster in real world use cases.
+Use <code>next(err)</code> to push a 500 error message to the client, <code>next(null,result)</code> to send the result with status 200.</p>
+
+<h1>Benchmarks</h1>
+
+<p>Internal benchmarks show how <em>Zen</em> versions are faster than Stack and Stack2</p>
+
+<p><img src="https://github.com/pblabs/zen/raw/master/results.png"></p>
+
+<h1>Conclusion</h1>
+
+<p><em>Zen</em> is available on github <a href="https://github.com/plabs/zen">here</a>
+under <a href="https://github.com/plabs/zen/blob/master/MIT-LICENSE.txt">MIT license</a>.</p>
+
+<p>If you found bugs, please fill issues on github.</p>
+
+<p>Feel free to fork, modify and have fun with it :)</p>
+
+<h2>Credits</h2>
+
+<p><em>Zen</em> takes ideas from Connect, Stack and internal projects under construction. </p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/pblabs">pblabs</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

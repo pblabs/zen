@@ -71,7 +71,7 @@ Due its general purpose, _Zen_ does not provide any middleware modules of any ki
 ## API
 
  - `zapp.errorHandler` : this is the default request handler and the called handler on errors. Must be a function.
-When an `errorHandler` throws exception, this is catched by the original errorHandler (that prints on console).
+When a `Handler` throws exception, this is catched by the original errorHandler (that prints on console).
  - `zapp.resultHandler` : this is the result handler. When it throws exception this is catched by the `errorHandler`.   
  - `zapp.pause` : pauses the engine and buffers the requests.
  - `zapp.stop` : stops the engine, requests will be forwarded to the errorHandler.
@@ -95,7 +95,7 @@ understand what is going on.
 _zen-http_ is a special flavour of _Zen_ for triadic handlers. It includes proper HTTP result and error handlers and default 404 response. Connect and Stack compatible, a lot faster in real world use cases.
 Use `next(err)` to push a 500 error message to the client, `next(null,result)` to send the result with status 200.
 
-## Benchmarks
+# Benchmarks
 
 Internal benchmarks show how _Zen_ versions are faster than Stack and Stack2
 

@@ -103,8 +103,8 @@ Internal benchmarks show how _Zen_ versions are faster than Stack and Stack2
 
 # Conclusion
 
-_Zen_ is available on github <a href='https://github.com/plabs/zen'>here</a>
-under <a href='https://github.com/plabs/zen/blob/master/MIT-LICENSE.txt'>MIT license</a>.
+_Zen_ is available on github <a href='https://github.com/pblabs/zen'>here</a>
+under <a href='https://github.com/pblabs/zen/blob/master/MIT-LICENSE.txt'>MIT license</a>.
 
 If you found bugs, please fill issues on github.
 

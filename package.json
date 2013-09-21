@@ -11,5 +11,5 @@
   	"benchmark" : "0.2.1"
    },
   "main": "zen.js",
-  "engines": { "node": ">= 0.4.0 < 0.9.0" }
+  "engines": { "node": ">= 0.4.0 < 0.11.0" }
 }

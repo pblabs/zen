@@ -44,29 +44,31 @@ module.exports= function (/*handlers*/) {
 			return errorHandler(a,b,ex);
 		}
 	};
-	var handlers=Array.prototype.slice.call(arguments).reverse();
-	var L=handlers.length-1;
+	var handlers=Array.prototype.slice.call(arguments);
+	handlers.push(defaultHandler); //last handler
 
 	var _engineRequests=[];
 	var _enginePaused=false;
 	var _engineStopped=false;
+	var firstM=handlers[0];
 	// The real Zen Engine
-	var engine= function (a,b) {		
-		if (_enginePaused===true) {_engineRequests.push([a,b]);return;}
-		if (_engineStopped===true) {return defaultHandler(a,b);}
+	var engine= function (a,b) {
+                if (_enginePaused || _engineStopped) {		
+			if (_enginePaused) {_engineRequests.push([a,b]);return;}
+			return defaultHandler(a,b);
+		}
 	
-		var i=L;
+		var i=1;
 		try {
-			function next (err,res) {
-				if(!res&&!err) {
-					if (--i>=0)
-						return handlers[i](a,b,next);
-				} else if (res)
-					return engine.resultHandler(a,b,res)
-				return engine.errorHandler(a,b,err);
+			function next(err,res) {
+				if (res||err){
+					if (res)
+						return engine.resultHandler(a,b,res)
+					return engine.errorHandler(a,b,err);	
+				}
+				return handlers[i++](a,b,next); //next handler
 			}
-
-			return handlers[i](a,b,next);
+			return firstM(a,b,next);
 		} catch (err) {
 			try {
 				return engine.errorHandler(a,b, err);
@@ -75,7 +77,7 @@ module.exports= function (/*handlers*/) {
 			}
 		}
 	}
-	if (L<0)
+	if (handlers.length==1)
 		engine=defaultHandler; //default
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;

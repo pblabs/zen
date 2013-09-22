@@ -184,7 +184,6 @@ this.core = {
 	var hw=function(a,b,next){next()};
 	var zapp=zen(hw);
 
-	//this runs 2 times
 	zapp.errorHandler=function(a,b,err){
 		test.ok(true, 'The errorHandler was executed');
 		next(); /*Exception!*/
@@ -192,8 +191,8 @@ this.core = {
 	zapp.resultHandler=function(a,b,res){test.ok(false, 'The resultHandler was executed');};		
 	test.doesNotThrow(function(){zapp({},fakeresp);});
 
-	test.expect(5);
-    test.done();
+	test.expect(4);
+        test.done();
 
 	},
 	'13. Zen should catch result handler exception ': function (test) {

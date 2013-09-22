@@ -260,7 +260,6 @@ this.core = {
 	var hw=function(next){next()};
 	var zapp=zen(hw);
 
-	//this runs 2 times
 	zapp.errorHandler=function(err){
 		test.ok(true, 'The errorHandler was executed');
 		next(); /*Exception!*/
@@ -268,7 +267,7 @@ this.core = {
 	zapp.resultHandler=function(res){test.ok(false, 'The resultHandler was executed');};		
 	test.doesNotThrow(function(){zapp();});
 
-	test.expect(3);
+	test.expect(2);
     test.done();
 
 	},

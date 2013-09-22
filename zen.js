@@ -32,87 +32,104 @@ module.exports= function (/*handlers*/) {
 	 * Default handler delegates to the error handler
 	 */
 	var defaultHandler = function(/*args*/) {
+		var args= Array.prototype.slice.call(arguments);
 		try {
-			var arg= Array.prototype.slice.call(arguments);
-			arg.push(undefined);//err
-			return engine.errorHandler.apply(this,arg);
+			args[args.length-1]=undefined;//err
+			return engine.errorHandler.apply(this,args);
 		} catch (ex) {
-			var arg= Array.prototype.slice.call(arguments);
-			arg.push(ex);//err
-			return errorHandler.apply(this,arg);
+			args[args.length-1]=ex;//err
+			return errorHandler.apply(this,args);
 		}
 	};
-	var handlers=Array.prototype.slice.call(arguments).reverse();
-	var L=handlers.length-1;
-	
+	var handlers=Array.prototype.slice.call(arguments);
+        handlers.push(defaultHandler);
+
 	var _engineRequests=[];
 	var _enginePaused=false;
 	var _engineStopped=false;
+	var firstM=handlers[0];
 	// The real Zen Engine
 	var engine= function (/*handleArgs*/) {
 		
-		if (_enginePaused===true) {_engineRequests.push(Array.prototype.slice.call(arguments));return;}
-		if (_engineStopped===true) {return defaultHandler.apply(this,Array.prototype.slice.call(arguments));}
+		var handleArgs=Array.prototype.slice.call(arguments);
+		var handleArgsLength=handleArgs.length;
 		
-		var i=L;
+		if (_enginePaused || _engineStopped){
+			if (_enginePaused) {_engineRequests.push(handleArgs);return;}
+			handleArgs.push(undefined); return defaultHandler.apply(this,handleArgs);
+		}
+	
+		var i=1;	
+		var self=this;
 		try {
-			var handleArgs=Array.prototype.slice.call(arguments);
-			var self=this;
 			//handler optimization
-			var argLength=arguments.length;
-			function handle(handler) {
-				switch (argLength) {
-					// faster
-					case 0:
-						return handler.call(self, next);
-						break;
-					case 1:
-						return handler.call(self, handleArgs[0],next);
-						break;
-					case 2:
-						return handler.call(self, handleArgs[0],handleArgs[1], next);
-						break;
-					case 3:
-						return handler.call(self, handleArgs[0],handleArgs[1], handleArgs[2],next);
-						break;
-					case 4:
-						return handler.call(self, handleArgs[0],handleArgs[1], handleArgs[2], handleArgs[3], next);
-						break;
-
-					// slower
-					default:
-						var nextedArgs=Array.prototype.slice.call(handleArgs);
-						nextedArgs.push(next)
-						return handler.apply(self, nextedArgs);
-				}
+			var handle;
+			var ha0,ha1,ha2,ha3;
+			switch (handleArgsLength) {
+				// faster
+				case 0:
+					handle= function(_handler){ 
+						return _handler.call(self,next);
+					};
+					break;
+				case 1:
+					ha0=handleArgs[0];
+					handle= function(_handler){ 
+						return _handler.call(self,ha0,next);
+					};
+					break;
+				case 2:
+					ha0=handleArgs[0];ha1=handleArgs[1];
+					handle= function(_handler){ 
+						return _handler.call(self,ha0,ha1, next);
+					};
+					break;
+				case 3:
+					ha0=handleArgs[0];ha1=handleArgs[1];ha2=handleArgs[2];
+					handle= function(_handler){ 
+						return _handler.call(self,ha0,ha1,ha2,next);
+					};
+					break;
+				case 4:
+					ha0=handleArgs[0];ha1=handleArgs[1];ha2=handleArgs[2];ha3=handleArgs[3];
+					handle= function(_handler){ 
+						return _handler.call(self,ha0,ha1,ha2,ha3, next);
+					};
+					break;
+				// slower
+				default:
+					handle= function(_handler){ 
+						return _handler.apply(self, handleArgs);
+					}
+					break;
 			}
 
 			function next (err,res) {
-				if(!res&&!err) {
-					if (--i>=0)
-						return handle(handlers[i]);
-				} else if (res) {
-					handleArgs.push(res);
-					return engine.resultHandler.apply(this,handleArgs);
-				}
-				handleArgs.push(err);
-				return engine.errorHandler.apply(this,handleArgs);
+				if(res || err){
+					if (res) {
+						handleArgs[handleArgsLength]=res;
+						return engine.resultHandler.apply(this,handleArgs);
+					}
+					handleArgs[handleArgsLength]=err;
+					return engine.errorHandler.apply(this,handleArgs);
+				}	
+				return handle(handlers[i++]);
 			}
-
-			return handle(handlers[i]);
+		        handleArgs.push(next);
+			return handle(firstM);
 		} catch (err) {
 			try {
-				console.log(err.stack);
-				handleArgs.push(err);
+				//console.log(err.stack);
+				handleArgs[handleArgsLength]=err;
 				return engine.errorHandler.apply(this,handleArgs);
 			} catch (ex) {
-				handleArgs[handleArgs.length-1]=ex;
+				handleArgs[handleArgsLength]=ex;
 				return errorHandler.apply(this,handleArgs);
 			}
 		}
 	}
-	if (L<0)
-		engine=defaultHandler; //default
+	/*if (handlers.length==1)
+		engine=defaultHandler; //default */
 	engine.errorHandler = errorHandler;
 	engine.resultHandler = resultHandler;
 	

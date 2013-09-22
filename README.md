@@ -1,22 +1,24 @@
 # <img src="https://github.com/pblabs/zen/raw/master/logo.png"> Zen
 
-_Z-engine (Zen)_ is the most simple, safe, minimal, fast, full featured, general purpose javascript module stack engine.
+_Z-engine (Zen)_ is the most simple, safe, minimal, fast, full featured, general purpose javascript module stack engine for Node.js.
 
-It's like Ruby's Rack or Python WSGI, but for Node.js.
+Basically it's like Connect or Stack, but simpler and faster.
 
+Zen comes into two flavours: zen-http and zen: 
+- zen is a general purpose engine
+- zen-http is designed to be used for triadic modules (like http servers) where extreme performance is a requirement.
+ 
 ## Install
 
 As simple as
 
     npm install zen
 
-If you don't use npm, then copy the single file `zen.js` somewhere you can get to it.   
-
 ## How to use
 
 	var zapp=require('../zen')(
 	  require('firstHandler')(),
-      require('secondHandler')(handleArg1, handleArg2),
+	  require('secondHandler')(handleArg1, handleArg2),
 	);
 	
 	var result = zapp(<proper>, <application>, <args>); 
@@ -35,7 +37,7 @@ Each handler needs to be of the form:
       // any exceptions need to be caught and forwarded to `next(err)`
 	  // result needs to be forwarded with `next(null,res)`	
 
-	  // without a call to `next` _Zen_ "drops" the chain  
+	  // without a call to `next` Zen "drops" the chain  
     }
 
 When using external modules we suggest to use the Setup Pattern, where the module is a callable function that returns the handler function.  
@@ -77,39 +79,22 @@ When a `Handler` throws exception, this is catched by the original errorHandler 
  - `zapp.stop` : stops the engine, requests will be forwarded to the errorHandler.
  - `zapp.resume` : resumes the engine and flushes the requests buffer on the engine.
 
-# Triadic subscriptions
-
-The Book <a href="http://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882">Clean Code</a> states: 
-	
-	The ideal number of arguments for a function is zero (niladic). 
-	Next comes one (monadic), followed closely by two (dyadic). 
-	Three arguments (triadic) should be avoided where possible. 
-	More than three (polyadic) requires very special justification -- and then shouldn't be used anyway.
-
-If you need multiple arguments there is a big chance that the method is doing more than it should or that you could abstract
-the operation better. Mind the Javascript objects!!! 
-
-Keep classes and functions as small as possible, break it into multiple "modules"... it is usually easier to 
-understand what is going on.
-
-_zen-http_ is a special flavour of _Zen_ for triadic handlers. It includes proper HTTP result and error handlers and default 404 response. Connect and Stack compatible, a lot faster in real world use cases.
+# Zen-http
+_zen-http_ is a special flavour of _Zen_ for triadic handlers (like http server). It includes proper HTTP result and error handlers and default 404 response. Connect and Stack compatible.
 Use `next(err)` to push a 500 error message to the client, `next(null,result)` to send the result with status 200.
 
 # Benchmarks
 
-Internal benchmarks show how _Zen_ versions are faster than Stack and Stack2
+_Zen_ flavours are faster than Stack and Stack2 on real world use cases
 
 <img src="https://github.com/pblabs/zen/raw/master/results.png">
 
 # Conclusion
 
-_Zen_ is available on github <a href='https://github.com/pblabs/zen'>here</a>
-under <a href='https://github.com/pblabs/zen/blob/master/MIT-LICENSE.txt'>MIT license</a>.
-
-If you found bugs, please fill issues on github.
-
-Feel free to fork, modify and have fun with it :)
+_Zen_ is available on <a href='https://github.com/pblabs/zen'>github</a>
+under <a href='https://github.com/pblabs/zen/blob/master/MIT-LICENSE.txt'>MIT license</a>. If you found bugs, please fill issues on <a href="https://github.com/pblabs/zen/issues">github</a>. 
+Feel free to fork, modify and have fun with it ;-)
 
 ## Credits
 
-_Zen_ takes ideas from Connect, Stack and internal projects under construction. 
+_Zen_ takes ideas from Connect and Stack

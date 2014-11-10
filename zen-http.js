@@ -2,6 +2,16 @@
  * Zen for triadic handler. Plus proper http error handling and responder
  */
 
+// environment
+var env = process.env.NODE_ENV || 'development';
+
+/**
+* Log error using console.error.
+*/
+function logerror(err){
+	if (env !== 'test') console.error("Error:",err.stack || err.toString());
+}
+
 /**
  * Default error handler
  */
@@ -11,14 +21,13 @@ var errorHandler = function error(req, resp, err) {
 			"Content-Type": "text/plain"
 		});
 		if (resp.end) resp.end(err.stack + "\n");
-		console.error(err.stack + "\n");
+		logerror(err);
 		return;
 	}
 	if (resp.writeHead) resp.writeHead(404, {
 		"Content-Type": "text/plain"
 	});
 	if (resp.end) resp.end("Not Found\n");
-	console.log("Not Found\n");
 };
 /**
  * Default result handler
@@ -28,7 +37,6 @@ var resultHandler = function result(req, resp, result) {
 		"Content-Type": "octet/stream"
 	});
 	if (resp.end) resp.end(result);
-	console.log("result");
 };
 /**
  * Zen uses a 'setup' pattern, returning a callable engine function
@@ -53,7 +61,7 @@ module.exports= function (/*handlers*/) {
 	var firstM=handlers[0];
 	// The real Zen Engine
 	var engine= function (a,b) {
-                if (_enginePaused || _engineStopped) {		
+		if (_enginePaused || _engineStopped) {		
 			if (_enginePaused) {_engineRequests.push([a,b]);return;}
 			return defaultHandler(a,b);
 		}

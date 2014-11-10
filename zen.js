@@ -2,17 +2,24 @@
  * Zen
  */
 
+// environment
+var env = process.env.NODE_ENV || 'development';
+
+/**
+* Log error using console.error.
+*/
+function logerror(err){
+	if (env !== 'test') console.error("Error:",err.stack || err.toString());
+}
+
 /**
  * Default error handler
  */
 var errorHandler = function error(/*args,*/ /*err*/) {
 	var err=(arguments.length >0)?arguments[arguments.length-1]:null;
 	if (typeof err == "undefined" || !err)
-		return console.error("Error:","This is the end, with no result given");
-	var error=err;
-	if (err.stack)
-		error=err.stack;
-	console.error("Error:",error);
+		return logerror("This is the end, with no result given");
+	logerror(err);
 	return;
 };
 /**
@@ -115,11 +122,10 @@ module.exports= function (/*handlers*/) {
 				}	
 				return handle(handlers[i++]);
 			}
-		        handleArgs.push(next);
+		    handleArgs.push(next);
 			return handle(firstM);
 		} catch (err) {
 			try {
-				//console.log(err.stack);
 				handleArgs[handleArgsLength]=err;
 				return engine.errorHandler.apply(this,handleArgs);
 			} catch (ex) {

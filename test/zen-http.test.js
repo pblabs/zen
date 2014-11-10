@@ -1,3 +1,5 @@
+process.env.NODE_ENV = "test";
+
 var zen=require('../zen-http');
 
 this.core = {

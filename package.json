@@ -1,6 +1,6 @@
 {
   "name": "zen",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "is a simple, safe, basic, fast, general purpose module engine",
   "keywords": ["engine", "stack", "module", "wsgi", "rack", "next"],
   "repository": "git://github.com/pblabs/zen.git",

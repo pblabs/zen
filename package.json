@@ -1,15 +1,29 @@
 {
   "name": "zen",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "is a simple, safe, basic, fast, general purpose module engine",
-  "keywords": ["engine", "stack", "module", "wsgi", "rack", "next"],
+  "keywords": [
+    "engine",
+    "stack",
+    "module",
+    "wsgi",
+    "rack",
+    "next"
+  ],
   "repository": "git://github.com/pblabs/zen.git",
   "author": "pibi <pibi@pianobit.com> (http://pianobit.com)",
   "dependencies": {},
-  "devDependencies": { 
-  	"nodeunit": "*",
-  	"benchmark" : "0.2.1"
-   },
+  "devDependencies": {
+    "benchmark": "0.2.1",
+    "nodeunit": "*",
+    "stack": "^0.1.0",
+    "stack2": "^2.0.3"
+  },
   "main": "zen.js",
-  "engines": { "node": ">= 0.4.0 < 0.11.0" }
+  "engines": {
+    "node": ">= 0.4.0"
+  }, "scripts": {
+    "bench": "node bench/bench.js",
+    "test": "nodeunit"
+  }
 }
